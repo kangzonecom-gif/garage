@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>อู่ซ่อมรถ design.by kang</title>
+<style>
+:root{--primary:#3498db;--success:#2ecc71;--danger:#e74c3c;--warning:#f39c12;--edit:#9b59b6;--cost:#e67e22;--bg:#f0f2f5;}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);margin:0;padding:10px;}
+.container{max-width:1550px;margin:auto;background:white;padding:16px;border-radius:20px;box-shadow:0 4px 25px rgba(0,0,0,0.05);}
+.grid-form{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:16px;}
+.field-group{display:flex;flex-direction:column;gap:4px;}
+.field-label{font-size:12px;color:#666;font-weight:700;margin-left:5px;}
+input,select,textarea{width:100%;padding:13px;border:1.5px solid #eee;border-radius:12px;font-size:16px;outline:none;background:#fcfcfc;}
+input:focus,select:focus,textarea:focus{border-color:var(--primary);background:#fff;}
+.full-width{grid-column:1/-1;}
+.parts-box{background:#f8f9fa;padding:15px;border-radius:15px;border:1.5px dashed #d1d5db;}
+.part-row{display:flex;gap:5px;margin-bottom:8px;}
+.main-btn{background:var(--success);color:white;border:none;padding:18px;border-radius:15px;cursor:pointer;font-weight:800;width:100%;font-size:18px;margin-top:10px;box-shadow:0 4px 10px rgba(46,204,113,0.2);}
+.photo-grid{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px;justify-content:center;}
+.photo-thumb{position:relative;width:75px;height:75px;border-radius:12px;overflow:hidden;border:1px solid #ddd;background:#eee;}
+.photo-thumb img{width:100%;height:100%;object-fit:cover;}
+.search-box{width:100%;padding:15px;border-radius:15px;border:2px solid var(--primary);font-size:16px;outline:none;}
+.photo-upload-btn{display:block;width:100%;padding:16px;border:2px dashed #3498db;border-radius:15px;background:#f0f7ff;color:#3498db;font-size:16px;font-weight:700;text-align:center;cursor:pointer;}
+.desktop-table{display:block;overflow-x:auto;margin-top:20px;}
+table{width:100%;border-collapse:collapse;font-size:13px;min-width:1100px;}
+th{background:var(--primary);color:white;padding:12px;text-align:left;position:sticky;top:0;}
+td{padding:12px;border-bottom:1px solid #eee;}
+.mobile-list{display:none;}
+.job-card{background:white;border-radius:20px;border:1px solid #eee;margin-bottom:15px;padding:18px;box-shadow:0 2px 12px rgba(0,0,0,0.03);}
+.card-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
+.card-money{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;background:#f0f7ff;padding:15px;border-radius:15px;text-align:center;}
+.pv-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.9);z-index:10000;align-items:center;justify-content:center;}
+.pv-overlay.active{display:flex;}
+.pv-overlay img{max-width:95%;max-height:80vh;border-radius:10px;}
+.badge{padding:5px 12px;border-radius:10px;font-size:11px;font-weight:800;}
+.s-waiting{background:#fef3c7;color:#92400e;}
+.s-inprog{background:#dbeafe;color:#1e40af;}
+.s-done{background:#d1fae5;color:#065f46;}
+.loading-overlay{display:none;position:fixed;inset:0;background:rgba(255,255,255,0.85);z-index:9999;flex-direction:column;align-items:center;justify-content:center;gap:12px;font-weight:bold;color:var(--primary);}
+.spinner{width:36px;height:36px;border:4px solid #e0e0e0;border-top-color:var(--primary);border-radius:50%;animation:spin 0.7s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+/* Login */
+.login-screen{position:fixed;inset:0;background:linear-gradient(135deg,#1e3c72,#2a5298);z-index:99999;display:flex;align-items:center;justify-content:center;}
+.login-box{background:white;border-radius:24px;padding:36px 32px;width:90%;max-width:380px;box-shadow:0 20px 60px rgba(0,0,0,0.3);}
+.login-title{font-size:22px;font-weight:800;text-align:center;margin-bottom:6px;color:#1a1a2e;}
+.login-sub{font-size:13px;color:#888;text-align:center;margin-bottom:24px;}
+.login-input{width:100%;padding:14px 16px;border:2px solid #eee;border-radius:12px;font-size:16px;outline:none;margin-bottom:12px;}
+.login-input:focus{border-color:#3498db;}
+.login-btn{width:100%;padding:15px;background:#3498db;color:white;border:none;border-radius:12px;font-size:16px;font-weight:800;cursor:pointer;margin-top:4px;}
+.login-btn:active{background:#2980b9;}
+.login-err{color:#e74c3c;font-size:13px;text-align:center;margin-top:8px;min-height:20px;}
+.role-badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:700;}
+.role-admin{background:#fee2e2;color:#991b1b;}
+.role-user{background:#e0f2fe;color:#075985;}
+.user-bar{display:flex;align-items:center;gap:10px;background:#f8f9fa;border-radius:12px;padding:8px 14px;margin-bottom:14px;}
+
+/* Admin-only elements */
+.admin-only{display:none;}
+
+@media(max-width:800px){
+  .desktop-table{display:none;}
+  .mobile-list{display:block;}
+  .grid-form{grid-template-columns:1fr 1fr;}
+}
+</style>
+</head>
+<body>
+
+<!-- Login Screen -->
+<div class="login-screen" id="loginScreen">
+  <div class="login-box">
+    <div style="text-align:center;font-size:48px;margin-bottom:8px;">🔧</div>
+    <div class="login-title">อู่ซ่อมรถ</div>
+    <div class="login-sub">กรุณาเข้าสู่ระบบเพื่อใช้งาน</div>
+    <input class="login-input" type="text" id="loginUser" placeholder="ชื่อผู้ใช้" autocomplete="off">
+    <input class="login-input" type="password" id="loginPass" placeholder="รหัสผ่าน" onkeydown="if(event.key==='Enter')doLogin()">
+    <button class="login-btn" onclick="doLogin()">🔑 เข้าสู่ระบบ</button>
+    <div class="login-err" id="loginErr"></div>
+  </div>
+</div>
+
+<div id="loading" class="loading-overlay">
+  <div class="spinner"></div>
+  <span id="loadingMsg">⏳ กำลังรับส่งข้อมูล...</span>
+</div>
+<div id="pvOverlay" class="pv-overlay" onclick="this.classList.remove('active')"><img id="pvImg" src="" alt=""></div>
+
+<div class="container" id="mainApp" style="display:none;">
+  <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
+    <h2 style="margin:0;font-size:22px;">🛠 อู่ซ่อมรถ design.by kang</h2>
+    <div style="display:flex;gap:8px;align-items:center;">
+      <button onclick="fetchData()" style="padding:10px 16px;border-radius:12px;background:#f3f4f6;border:none;font-weight:700;cursor:pointer;">🔄 รีเฟรช</button>
+      <button onclick="doLogout()" style="padding:10px 16px;border-radius:12px;background:#fee2e2;border:none;font-weight:700;color:#991b1b;cursor:pointer;">🚪 ออก</button>
+    </div>
+  </div>
+
+  <!-- User bar -->
+  <div class="user-bar" id="userBar" style="margin-top:12px;">
+    <span id="userIcon" style="font-size:20px;">👤</span>
+    <div>
+      <div id="userNameLabel" style="font-weight:700;font-size:14px;"></div>
+      <div id="userRoleLabel" style="font-size:12px;color:#888;"></div>
+    </div>
+    <div style="margin-left:auto;" id="userRoleBadge"></div>
+  </div>
+
+  <!-- Form (admin only) -->
+  <div id="formSection" class="admin-only">
+    <div class="grid-form" style="margin-top:16px;">
+      <div class="field-group"><span class="field-label">👤 ชื่อลูกค้า</span><input type="text" id="custName" placeholder="ระบุชื่อ *" autocomplete="off"></div>
+      <div class="field-group"><span class="field-label">📞 เบอร์โทร</span><input type="tel" id="custTel" placeholder="08x-xxxxxxx"></div>
+      <div class="field-group"><span class="field-label">🚗 ประเภทรถ</span>
+        <select id="carModel">
+          <option value="รถยนต์">🚗 รถยนต์</option>
+          <option value="รถไฟฟ้า">⚡ รถไฟฟ้า</option>
+          <option value="รถมอเตอร์ไซค์">🏍️ รถมอเตอร์ไซค์</option>
+          <option value="นำอะไหล่มาซ่อม">🔩 นำอะไหล่มาซ่อม</option>
+        </select>
+      </div>
+      <div class="field-group"><span class="field-label">🚦 สถานะงาน</span>
+        <select id="jobStatus">
+          <option value="waiting">⏳ รอดำเนินการ</option>
+          <option value="inprog">🔨 กำลังซ่อม</option>
+          <option value="done">✅ เสร็จแล้ว</option>
+        </select>
+      </div>
+      <div class="field-group"><span class="field-label">👷‍♂️ ช่าง</span>
+        <select id="mechanic">
+          <option value="">— เลือกช่าง —</option>
+          <option value="ช่างเก่ง">🔧 ช่างเก่ง</option>
+          <option value="ช่างบี">🔧 ช่างบี</option>
+          <option value="ช่างนัท">🔧 ช่างนัท</option>
+          <option value="ช่างกัส">🔧 ช่างกัส</option>
+        </select>
+      </div>
+      <div class="field-group"><span class="field-label">💰 ค่าแรง (บาท)</span><input type="number" id="laborCost" value="0" inputmode="numeric"></div>
+      <div class="field-group full-width"><span class="field-label">📝 อาการ / ปัญหา</span><textarea id="problem" placeholder="รายละเอียดการซ่อม..." rows="2"></textarea></div>
+      <div class="parts-box full-width">
+        <div style="display:flex;justify-content:space-between;margin-bottom:10px;">
+          <strong style="color:#444;">🔩 รายการอะไหล่ (ทุน-ขาย)</strong>
+          <button onclick="addPart()" style="background:var(--primary);color:white;border:none;padding:6px 15px;border-radius:10px;font-weight:700;cursor:pointer;">+ เพิ่ม</button>
+        </div>
+        <div id="pc"></div>
+      </div>
+      <div class="full-width">
+        <div id="photoPreview" class="photo-grid" style="margin-bottom:8px;"></div>
+        <label style="display:block;">
+          <span class="photo-upload-btn" id="photoBtn">📸 แตะเพื่อเลือกรูปภาพ (สูงสุด 3 รูป)</span>
+          <input type="file" id="photoInput" accept="image/*" style="display:none" onchange="handlePhoto(this)">
+        </label>
+      </div>
+    </div>
+    <button onclick="saveToSheets()" class="main-btn" id="btnSubmit">💾 บันทึกเข้า Google Sheets</button>
+    <button onclick="resetForm()" style="width:100%;padding:12px;margin-top:8px;border-radius:15px;border:1.5px solid #ddd;background:#f9f9f9;font-weight:700;cursor:pointer;font-size:15px;">↩️ ล้างฟอร์ม</button>
+  </div>
+
+  <!-- Info banner for user -->
+  <div id="userBanner" style="display:none;background:#f0f9ff;border:1px solid #bae6fd;border-radius:12px;padding:12px 16px;margin-top:12px;font-size:14px;color:#0369a1;">
+    👁️ คุณเห็นเฉพาะรายการที่มีสถานะ <strong>⏳ รอดำเนินการ</strong>
+  </div>
+
+  <!-- Search -->
+  <div style="margin:16px 0 8px;">
+    <input type="text" id="searchBox" class="search-box" placeholder="🔍 ค้นหาชื่อ หรือ งานซ่อม...">
+  </div>
+  <div id="resultCount" style="font-size:13px;color:#3498db;font-weight:600;margin-bottom:8px;min-height:20px;"></div>
+
+  <div class="desktop-table">
+    <table>
+      <thead><tr>
+        <th>วันที่</th><th>ลูกค้า/รถ</th><th>ช่าง</th><th>สถานะ</th>
+        <th>รายละเอียด/อะไหล่</th><th>รูป</th>
+        <th class="admin-only">ทุน</th>
+        <th class="admin-only">กำไร</th>
+        <th class="admin-only">รวม</th>
+        <th class="admin-only">จัดการ</th>
+      </tr></thead>
+      <tbody id="jobList"></tbody>
+    </table>
+  </div>
+  <div id="mobileList" class="mobile-list"></div>
+</div>
+
+<script>
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwkhTJzDodjZoFFh_mHIyWZMDEfOEO7xrlROebd-6wmT-8cvf4MBwPkStC8zyEAJug_/exec";
+
+// ---- บัญชีผู้ใช้ ----
+const ACCOUNTS = {
+  'admin':  { pass: '1234',   role: 'admin', display: 'ผู้ดูแลระบบ' },
+  'user':   { pass: '0000',   role: 'user',  display: 'ผู้ใช้ทั่วไป' },
+  'user2':  { pass: '1111',   role: 'user',  display: 'ผู้ใช้ทั่วไป 2' },
+};
+
+let jobs = [], currentPhotos = [], editId = null, searchTimer = null;
+let currentRole = null, currentUser = null;
+
+// ---- Login ----
+function doLogin() {
+  const u = document.getElementById('loginUser').value.trim();
+  const p = document.getElementById('loginPass').value;
+  const acc = ACCOUNTS[u];
+  if (!acc || acc.pass !== p) {
+    document.getElementById('loginErr').textContent = '❌ ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง';
+    return;
+  }
+  currentUser = u;
+  currentRole = acc.role;
+  sessionStorage.setItem('gar_user', u);
+  sessionStorage.setItem('gar_role', acc.role);
+  document.getElementById('loginScreen').style.display = 'none';
+  document.getElementById('mainApp').style.display = 'block';
+  applyRole();
+  fetchData();
+}
+
+function doLogout() {
+  sessionStorage.clear();
+  currentUser = currentRole = null;
+  document.getElementById('mainApp').style.display = 'none';
+  document.getElementById('loginScreen').style.display = 'flex';
+  document.getElementById('loginUser').value = '';
+  document.getElementById('loginPass').value = '';
+  document.getElementById('loginErr').textContent = '';
+}
+
+function applyRole() {
+  const isAdmin = currentRole === 'admin';
+  const acc = ACCOUNTS[currentUser];
+  // user bar
+  document.getElementById('userNameLabel').textContent = acc.display + ' (' + currentUser + ')';
+  document.getElementById('userRoleLabel').textContent = isAdmin ? 'สิทธิ์: ผู้ดูแลระบบ' : 'สิทธิ์: ผู้ใช้ทั่วไป';
+  document.getElementById('userRoleBadge').innerHTML = isAdmin
+    ? '<span class="role-badge role-admin">👑 Admin</span>'
+    : '<span class="role-badge role-user">👤 User</span>';
+  // show/hide admin elements
+  document.querySelectorAll('.admin-only').forEach(el => {
+    el.style.display = isAdmin ? (el.tagName === 'TH' ? 'table-cell' : 'block') : 'none';
+  });
+  document.getElementById('userBanner').style.display = isAdmin ? 'none' : 'block';
+  // search placeholder
+  if (!isAdmin) {
+    document.getElementById('searchBox').placeholder = '🔍 ค้นหาชื่อลูกค้า...';
+  }
+}
+
+// ---- Utility ----
+function showLoading(msg='⏳ กำลังรับส่งข้อมูล...'){
+  document.getElementById('loadingMsg').textContent=msg;
+  document.getElementById('loading').style.display='flex';
+}
+function hideLoading(){document.getElementById('loading').style.display='none';}
+
+function debouncedRender(){
+  clearTimeout(searchTimer);
+  searchTimer = setTimeout(renderTable, 50);
+}
+
+// ---- Parts ----
+function addPart(n='',c='',s=''){
+  const div=document.createElement('div');
+  div.className='part-row';
+  div.innerHTML=`<input type="text" class="p-name" placeholder="ชื่ออะไหล่" value="${escHtml(n)}" style="flex:2">
+    <input type="number" class="p-cost" placeholder="ทุน" value="${c}" inputmode="numeric" style="flex:1">
+    <input type="number" class="p-sell" placeholder="ขาย" value="${s}" inputmode="numeric" style="flex:1">
+    <button onclick="this.parentElement.remove()" style="background:none;border:none;color:#e74c3c;font-size:22px;cursor:pointer;padding:0 6px;">×</button>`;
+  document.getElementById('pc').appendChild(div);
+}
+
+// ---- Photos ----
+function shrinkImg(file){
+  return new Promise(res=>{
+    const r=new FileReader();
+    r.onload=e=>{
+      const img=new Image();
+      img.onload=()=>{
+        const MAX=200,c=document.createElement('canvas');
+        let w=img.width,h=img.height;
+        if(w>=h){if(w>MAX){h=Math.round(h*MAX/w);w=MAX;}}else{if(h>MAX){w=Math.round(w*MAX/h);h=MAX;}}
+        c.width=w;c.height=h;
+        c.getContext('2d').drawImage(img,0,0,w,h);
+        res(c.toDataURL('image/jpeg',0.3));
+      };
+      img.src=e.target.result;
+    };
+    r.readAsDataURL(file);
+  });
+}
+async function handlePhoto(input){
+  for(const f of [...input.files]){
+    if(currentPhotos.length>=3){alert('เพิ่มได้สูงสุด 3 รูป');break;}
+    currentPhotos.push(await shrinkImg(f));
+  }
+  input.value='';
+  renderPhotoPreview();
+}
+function renderPhotoPreview(){
+  document.getElementById('photoPreview').innerHTML=currentPhotos.map((s,i)=>
+    `<div class="photo-thumb"><img src="${s}" onclick="viewPhoto('${s}')">
+     <button onclick="currentPhotos.splice(${i},1);renderPhotoPreview();"
+       style="position:absolute;top:2px;right:2px;background:rgba(231,76,60,.85);color:white;border:none;border-radius:50%;width:20px;height:20px;font-size:12px;cursor:pointer;">×</button>
+    </div>`
+  ).join('');
+  document.getElementById('photoBtn').textContent = currentPhotos.length >= 3
+    ? '✅ เพิ่มรูปครบแล้ว (3/3)'
+    : `📸 แตะเพื่อเลือกรูปภาพ (${currentPhotos.length}/3)`;
+}
+function viewPhoto(src){document.getElementById('pvImg').src=src;document.getElementById('pvOverlay').classList.add('active');}
+
+// ---- Fetch ----
+async function fetchData(){
+  showLoading('🔄 โหลดข้อมูล...');
+  try{
+    const res=await fetch(SCRIPT_URL+'?t='+Date.now());
+    const txt=await res.text();
+    let data;
+    try{ data=JSON.parse(txt); }catch(e){ throw new Error('parse error: '+txt.slice(0,80)); }
+    if(!Array.isArray(data)) throw new Error('ข้อมูลไม่ถูกต้อง');
+    // map field names: รองรับทั้ง v29 (name/tel/car) และ v30 (custName/custTel/carModel)
+    jobs=data.filter(j=>j.custName||j.name||j.date).map(j=>({
+      id:       String(j.id||j.timestamp||Math.random()),
+      custName: String(j.custName||j.name||''),
+      custTel:  String(j.custTel||j.tel||''),
+      carModel: String(j.carModel||j.car||''),
+      mechanic: String(j.mechanic||''),
+      laborCost:Number(j.laborCost||j.labor||0),
+      problem:  String(j.problem||''),
+      parts:    Array.isArray(j.parts)?j.parts:[],
+      date:     String(j.date||j.timestamp||''),
+      status:   String(j.status||'waiting'),
+      photos:   Array.isArray(j.photos)?j.photos:[]
+    }));
+    renderTable();
+    initSearch();
+  }catch(e){
+    console.error(e);
+    const msg = e.message || String(e);
+    document.getElementById('resultCount').innerHTML =
+      '<span style="color:red">❌ โหลดล้มเหลว: '+msg+'</span>';
+    alert('โหลดข้อมูลล้มเหลว:\n'+msg+'\n\nกรุณาตรวจสอบ:\n1. SCRIPT_URL ถูกต้อง\n2. Apps Script deploy แล้ว (Anyone can access)');
+  }
+  hideLoading();
+}
+
+// ---- Render ----
+function escHtml(str){try{return String(str==null?'':str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}catch(e){return '';}}
+function formatDate(d){if(!d)return'-';try{const dt=new Date(d);if(isNaN(dt))return d;return dt.toLocaleString('th-TH',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'});}catch{return d;}}
+function formatTel(t){return String(t||'').replace(/(\d{3})(\d{3})(\d{4})/,'$1-$2-$3')||String(t||'')||'-';}
+const STATUS_MAP={waiting:'⏳ รอดำเนินการ',inprog:'🔨 กำลังซ่อม',done:'✅ เสร็จแล้ว'};
+function calcJob(j){
+  const pl=j.parts||[];
+  const tCost=pl.reduce((s,p)=>s+Number(p.cost||0),0);
+  const tSell=pl.reduce((s,p)=>s+Number(p.sell||0),0)+Number(j.laborCost||0);
+  return{tCost,tSell,tProfit:tSell-tCost};
+}
+
+function renderTable(){
+  const term=(document.getElementById('searchBox').value||'').toLowerCase().trim();
+  const isAdmin=currentRole==='admin';
+
+  // กรองตาม role
+  let visible=isAdmin?jobs:jobs.filter(j=>j.status==='waiting');
+  // กรองตามคำค้นหา
+  let filtered=term===''?visible:visible.filter(j=>(j.custName+' '+(j.problem||'')+' '+(j.mechanic||'')).toLowerCase().includes(term));
+
+  // result count
+  const rc=document.getElementById('resultCount');
+  if(rc) rc.textContent=term?'🔍 พบ '+filtered.length+' รายการ จากทั้งหมด '+visible.length+' รายการ':'แสดง '+filtered.length+' รายการ';
+
+  // Desktop
+  const tbody=document.getElementById('jobList');
+  tbody.innerHTML='';
+  // Mobile
+  const mList=document.getElementById('mobileList');
+  mList.innerHTML='';
+
+  if(!filtered.length){
+    tbody.innerHTML='<tr><td colspan="10" style="text-align:center;padding:30px;color:#aaa;">ไม่พบข้อมูล</td></tr>';
+    mList.innerHTML='<div style="text-align:center;padding:30px;color:#aaa;">ไม่พบข้อมูล</div>';
+    return;
+  }
+
+  filtered.forEach(j=>{
+    const {tCost,tSell,tProfit}=calcJob(j);
+    const statusT=STATUS_MAP[j.status]||j.status;
+    const mechanic=escHtml(j.mechanic||'-');
+    const partsT=j.parts?j.parts.map(p=>`• ${escHtml(p.name)} (ท:${p.cost}/ข:${p.sell})`).join('<br>'):'';
+    const photoH=Array.isArray(j.photos)?j.photos.map(p=>`<img src="${p}" style="width:45px;height:45px;border-radius:10px;margin:2px;cursor:pointer;object-fit:cover;" loading="lazy" onclick="viewPhoto('${p}')">`).join(''):'';
+    const manageBtns=isAdmin?`<td style="white-space:nowrap">
+      <button onclick="editJob('${j.id}')" style="padding:6px 10px;border-radius:8px;border:1px solid var(--warning);background:#fff;color:var(--warning);cursor:pointer;font-weight:700;">✏️</button>
+      <button onclick="deleteJob('${j.id}')" style="padding:6px 10px;border-radius:8px;border:1px solid var(--danger);background:#fff;color:var(--danger);cursor:pointer;font-weight:700;">🗑️</button>
+    </td>`:'';
+    const moneyTds=isAdmin?`<td style="color:var(--cost)">${tCost}</td><td style="color:var(--edit)">${tProfit}</td><td style="color:var(--success)"><b>${tSell}</b></td>`:'';
+
+    // Desktop row
+    const tr=document.createElement('tr');
+    tr.innerHTML=`<td style="white-space:nowrap">${formatDate(j.date)}</td>
+      <td><b>${escHtml(j.custName)}</b><br><small>${escHtml(j.carModel)}</small><br><small><a href="tel:${formatTel(j.custTel)}" style="color:#3498db;text-decoration:none;">📞 ${formatTel(j.custTel)}</a></small></td>
+      <td><small>🔧${mechanic}</small></td>
+      <td><span class="badge s-${j.status}">${statusT}</span></td>
+      <td>${escHtml(j.problem)}<br><div style="font-size:12px;color:#555;">${partsT}</div>${j.laborCost?`<div style="color:var(--primary);font-weight:700;font-size:12px;">ค่าแรง: ${j.laborCost}</div>`:''}</td>
+      <td>${photoH}</td>
+      ${moneyTds}${manageBtns}`;
+    tbody.appendChild(tr);
+
+    // Mobile card
+    const card=document.createElement('div');
+    card.className='job-card';
+    card.innerHTML=`
+      <div class="card-header"><div><b>${escHtml(j.custName)}</b><br><a href="tel:${formatTel(j.custTel)}" style="color:#3498db;font-weight:400;font-size:13px;text-decoration:none;">📞 ${formatTel(j.custTel)}</a></div><span class="badge s-${j.status}">${statusT}</span></div>
+      <div style="font-size:13px;color:#555;margin-bottom:4px;">📍 ${escHtml(j.carModel)} | 🔧 ${escHtml(j.mechanic||'-')}</div>
+      <div style="font-size:12px;color:#aaa;margin-bottom:6px;">🗓 ${formatDate(j.date)}</div>
+      <div style="font-size:14px;margin-bottom:10px;">${escHtml(j.problem)}<div style="font-size:12px;color:#555;margin-top:6px;">${partsT}</div>${j.laborCost?`<div style="color:var(--primary);font-weight:700;font-size:13px;margin-top:4px;">ค่าแรง: ${j.laborCost} บ.</div>`:''}</div>
+      <div style="margin-bottom:10px;">${photoH}</div>
+      ${isAdmin?`<div class="card-money">
+        <div><small>ทุน</small><br><b style="color:var(--cost)">${tCost}</b></div>
+        <div><small>กำไร</small><br><b style="color:var(--edit)">${tProfit}</b></div>
+        <div><small>รวม</small><br><b style="color:var(--success)">${tSell}</b></div>
+      </div>
+      <div style="display:flex;gap:10px;margin-top:12px;">
+        <button onclick="editJob('${j.id}')" style="flex:1;padding:12px;border-radius:15px;border:1px solid var(--warning);color:var(--warning);background:#fff;font-weight:800;cursor:pointer;">✏️ แก้ไข</button>
+        <button onclick="deleteJob('${j.id}')" style="flex:1;padding:12px;border-radius:15px;border:1px solid var(--danger);color:var(--danger);background:#fff;font-weight:800;cursor:pointer;">🗑️ ลบ</button>
+      </div>`:''}`;
+    mList.appendChild(card);
+  });
+}
+
+// ---- Search init (Thai IME fix) ----
+function initSearch(){
+  const sb=document.getElementById('searchBox');
+  if(!sb||sb._init) return;
+  sb._init=true;
+  function fire(){ clearTimeout(searchTimer); searchTimer=setTimeout(renderTable,50); }
+  ['input','keyup','change'].forEach(ev=>sb.addEventListener(ev,fire));
+  sb.addEventListener('compositionend',()=>{clearTimeout(searchTimer);searchTimer=setTimeout(renderTable,10);});
+  let _last='';
+  setInterval(()=>{if(sb.value!==_last){_last=sb.value;renderTable();}},300);
+}
+
+// ---- Edit ----
+function editJob(id){
+  if(currentRole!=='admin') return;
+  const job=jobs.find(j=>String(j.id)===String(id));
+  if(!job) return;
+  editId=id;
+  document.getElementById('custName').value=job.custName||'';
+  document.getElementById('custTel').value=job.custTel||'';
+  document.getElementById('carModel').value=job.carModel||'รถยนต์';
+  document.getElementById('jobStatus').value=job.status||'waiting';
+  document.getElementById('mechanic').value=job.mechanic||'';
+  document.getElementById('laborCost').value=job.laborCost||0;
+  document.getElementById('problem').value=job.problem||'';
+  document.getElementById('pc').innerHTML='';
+  if(Array.isArray(job.parts)) job.parts.forEach(p=>addPart(p.name,p.cost,p.sell));
+  currentPhotos=Array.isArray(job.photos)?[...job.photos]:[];
+  renderPhotoPreview();
+  const btn=document.getElementById('btnSubmit');
+  btn.innerHTML='🆙 อัปเดตข้อมูล';
+  btn.style.background='var(--edit)';
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function resetForm(){
+  editId=null;
+  ['custName','custTel','problem'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('carModel').value='รถยนต์';
+  document.getElementById('jobStatus').value='waiting';
+  document.getElementById('mechanic').value='';
+  document.getElementById('laborCost').value=0;
+  document.getElementById('pc').innerHTML='';
+  currentPhotos=[];
+  renderPhotoPreview();
+  const btn=document.getElementById('btnSubmit');
+  btn.innerHTML='💾 บันทึกเข้า Google Sheets';
+  btn.style.background='var(--success)';
+}
+
+// ---- Save ----
+async function saveToSheets(){
+  if(currentRole!=='admin') return;
+  const name=document.getElementById('custName').value.trim();
+  if(!name) return alert('กรุณาใส่ชื่อลูกค้า');
+  showLoading('💾 กำลังบันทึก...');
+  const parts=[];
+  document.querySelectorAll('.part-row').forEach(row=>{
+    const n=row.querySelector('.p-name').value.trim();
+    if(n) parts.push({name:n,cost:Number(row.querySelector('.p-cost').value)||0,sell:Number(row.querySelector('.p-sell').value)||0});
+  });
+  const origJob=editId?jobs.find(j=>String(j.id)===String(editId)):null;
+  const payload={
+    action:editId?'update':'save',
+    id:editId||String(Date.now()),
+    timestamp:origJob?origJob.date:new Date().toISOString(),
+    custName:name,
+    custTel:document.getElementById('custTel').value.trim(),
+    carModel:document.getElementById('carModel').value,
+    mechanic:document.getElementById('mechanic').value.trim(),
+    laborCost:Number(document.getElementById('laborCost').value)||0,
+    problem:document.getElementById('problem').value.trim(),
+    parts,
+    date:origJob?origJob.date:new Date().toISOString(),
+    status:document.getElementById('jobStatus').value,
+    photos:currentPhotos
+  };
+  try{
+    // ใช้ action-based ตรง ๆ ที่ Apps Script รองรับ
+    await fetch(SCRIPT_URL,{method:'POST',body:JSON.stringify(payload)});
+    resetForm();
+    await fetchData();
+  }catch(e){alert('บันทึกล้มเหลว: '+e.message);hideLoading();}
+}
+
+// ---- Delete ----
+async function deleteJob(id){
+  if(currentRole!=='admin') return;
+  if(!confirm('ลบรายการนี้ถาวร?')) return;
+  showLoading('🗑️ กำลังลบ...');
+  try{
+    await fetch(SCRIPT_URL,{method:'POST',body:JSON.stringify({action:'delete',id})});
+    await fetchData();
+  }catch(e){alert('ลบล้มเหลว: '+e.message);hideLoading();}
+}
+
+// ---- Init ----
+window.addEventListener('load',function(){
+  // ตรวจ session
+  const su=sessionStorage.getItem('gar_user');
+  const sr=sessionStorage.getItem('gar_role');
+  if(su&&sr&&ACCOUNTS[su]){
+    currentUser=su; currentRole=sr;
+    document.getElementById('loginScreen').style.display='none';
+    document.getElementById('mainApp').style.display='block';
+    applyRole();
+    fetchData();
+  }
+  // Enter key on login
+  document.getElementById('loginPass').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
+});
+</script>
+</body>
+</html>
