@@ -176,7 +176,7 @@ td{padding:12px;border-bottom:1px solid #eee;}
         <th class="admin-only">ทุน</th>
         <th class="admin-only">กำไร</th>
         <th class="admin-only">รวม</th>
-        <th class="admin-only">จัดการ</th>
+        <th>จัดการ</th>
       </tr></thead>
       <tbody id="jobList"></tbody>
     </table>
@@ -399,10 +399,10 @@ function renderTable(){
     const mechanic=escHtml(j.mechanic||'-');
     const partsT=j.parts?j.parts.map(p=>`• ${escHtml(p.name)} (ท:${p.cost}/ข:${p.sell})`).join('<br>'):'';
     const photoH=Array.isArray(j.photos)?j.photos.map(p=>`<img src="${p}" style="width:45px;height:45px;border-radius:10px;margin:2px;cursor:pointer;object-fit:cover;" loading="lazy" onclick="viewPhoto('${p}')">`).join(''):'';
-    const manageBtns=isAdmin?`<td style="white-space:nowrap">
+    const manageBtns=`<td style="white-space:nowrap">
       <button onclick="editJob('${j.id}')" style="padding:6px 10px;border-radius:8px;border:1px solid var(--warning);background:#fff;color:var(--warning);cursor:pointer;font-weight:700;">✏️</button>
-      <button onclick="deleteJob('${j.id}')" style="padding:6px 10px;border-radius:8px;border:1px solid var(--danger);background:#fff;color:var(--danger);cursor:pointer;font-weight:700;">🗑️</button>
-    </td>`:'';
+      ${isAdmin?`<button onclick="deleteJob('${j.id}')" style="padding:6px 10px;border-radius:8px;border:1px solid var(--danger);background:#fff;color:var(--danger);cursor:pointer;font-weight:700;">🗑️</button>`:''}
+    </td>`;
     const moneyTds=isAdmin?`<td style="color:var(--cost)">${tCost}</td><td style="color:var(--edit)">${tProfit}</td><td style="color:var(--success)"><b>${tSell}</b></td>`:'';
 
     // Desktop row
@@ -452,7 +452,6 @@ function initSearch(){
 
 // ---- Edit ----
 function editJob(id){
-  if(currentRole!=='admin') return;
   const job=jobs.find(j=>String(j.id)===String(id));
   if(!job) return;
   editId=id;
