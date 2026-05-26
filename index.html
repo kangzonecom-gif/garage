@@ -310,38 +310,46 @@ function renderPhotoPreview(){
 function viewPhoto(src){document.getElementById('pvImg').src=src;document.getElementById('pvOverlay').classList.add('active');}
 
 // ---- Fetch ----
-async function fetchData(){
+function fetchData(){
   showLoading('🔄 โหลดข้อมูล...');
-  try{
-    const res=await fetch(SCRIPT_URL+'?t='+Date.now());
-    const txt=await res.text();
-    let data;
-    try{ data=JSON.parse(txt); }catch(e){ throw new Error('parse error: '+txt.slice(0,80)); }
-    if(!Array.isArray(data)) throw new Error('ข้อมูลไม่ถูกต้อง');
-    // map field names: รองรับทั้ง v29 (name/tel/car) และ v30 (custName/custTel/carModel)
-    jobs=data.filter(j=>j.custName||j.name||j.date).map(j=>({
-      id:       String(j.id||j.timestamp||Math.random()),
-      custName: String(j.custName||j.name||''),
-      custTel:  String(j.custTel||j.tel||''),
-      carModel: String(j.carModel||j.car||''),
+  /* ใช้ JSONP เพื่อข้าม CORS */
+  var cbName='_gsCb'+Date.now();
+  var s=document.createElement('script');
+  var done=false;
+  window[cbName]=function(data){
+    done=true;
+    delete window[cbName]; s.remove();
+    if(!Array.isArray(data)){
+      hideLoading();
+      document.getElementById('resultCount').innerHTML='<span style="color:red">❌ ข้อมูลไม่ถูกต้อง</span>';
+      return;
+    }
+    jobs=data.filter(function(j){return j.custName||j.date;}).map(function(j){return{
+      id:       String(j.id||''),
+      custName: String(j.custName||''),
+      custTel:  String(j.custTel||''),
+      carModel: String(j.carModel||''),
       mechanic: String(j.mechanic||''),
-      laborCost:Number(j.laborCost||j.labor||0),
+      laborCost:Number(j.laborCost)||0,
       problem:  String(j.problem||''),
       parts:    Array.isArray(j.parts)?j.parts:[],
-      date:     String(j.date||j.timestamp||''),
+      date:     String(j.date||''),
       status:   String(j.status||'waiting'),
       photos:   Array.isArray(j.photos)?j.photos:[]
-    }));
+    };});
     renderTable();
     initSearch();
-  }catch(e){
-    console.error(e);
-    const msg = e.message || String(e);
-    document.getElementById('resultCount').innerHTML =
-      '<span style="color:red">❌ โหลดล้มเหลว: '+msg+'</span>';
-    alert('โหลดข้อมูลล้มเหลว:\n'+msg+'\n\nกรุณาตรวจสอบ:\n1. SCRIPT_URL ถูกต้อง\n2. Apps Script deploy แล้ว (Anyone can access)');
-  }
-  hideLoading();
+    hideLoading();
+  };
+  s.onerror=function(){
+    if(done) return;
+    delete window[cbName]; s.remove();
+    hideLoading();
+    document.getElementById('resultCount').innerHTML='<span style="color:red">❌ โหลดล้มเหลว - กรุณากด รีเฟรช</span>';
+    alert('โหลดข้อมูลล้มเหลว\nกรุณาตรวจสอบ Apps Script deploy แล้วหรือยัง');
+  };
+  s.src=SCRIPT_URL+'?callback='+cbName+'&t='+Date.now();
+  document.head.appendChild(s);
 }
 
 // ---- Render ----
